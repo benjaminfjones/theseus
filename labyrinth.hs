@@ -32,17 +32,6 @@ instance (Show a) => Show (Node a) where
                                    (show' (n+1) node2)
         pad n = concat . take n . repeat $ "   "
 
--- Example:
-l0 :: Node (Int, Int)
-l0 = Fork (0,2) 
-     (Fork (-2, 0) 
-           (DeadEnd (0,-2)) 
-           (DeadEnd (-1,0)))
-     (Passage (2,0) 
-              (Fork (1,0)
-                    (Passage (0,1)
-                             (DeadEnd (0,0)))
-                    (DeadEnd (0,-1))))
 
 -- | We keep track of the player using a list of branches. There are three types of 
 -- branches.
@@ -75,18 +64,30 @@ put x (t, Fork _ y z) = (t, Fork x y z)
 --------------------------------------------------------------------------------
 -- Moving the player through the labyrinth
 
+-- | Turn right in the labyrinth, if possible, returning a Zipper with updated
+-- focus. If a right turn is not possible (e.g. player is not at a Fork), return
+-- Nothing.
 turnRight :: Zipper a -> Maybe (Zipper a)
 turnRight (t, Fork x l r) = Just (TurnRight x l : t, r) -- you can only turn right at
 turnRight _ = Nothing -- failed movement                -- a fork
 
+-- | Turn left in the labyrinth, if possible, returning a Zipper with updated
+-- focus. If a left turn is not possible (e.g. player is not at a Fork), return
+-- Nothing.
 turnLeft :: Zipper a -> Maybe (Zipper a)
 turnLeft (t, Fork x l r) = Just (TurnLeft x r : t, l)
 turnLeft _ = Nothing
 
+-- | Continue straight on in the labyrinth, if possible, returning a Zipper with updated
+-- focus. If continuation is not possible (e.g. player is not at a Passage), return
+-- Nothing.
 straight :: Zipper a -> Maybe (Zipper a)
 straight (t, Passage x n) = Just (Straight x:t, n)
 straight _ = Nothing
 
+-- | Backup one step in the labyrinth, if possible, returning a Zipper with updated
+-- focus. If backing up is not possible (e.g. player is at the start), return
+-- Nothing.
 back :: Zipper a -> Maybe (Zipper a)
 back (Straight x:t, n)    = Just (t, Passage x n)
 back (TurnLeft x r:t, l)  = Just (t, Fork x l r)
