@@ -1,0 +1,11 @@
+Name:                theseus
+Version:             0.0
+Description:         Labyrinth game inspired by Monad.Reader special issue
+License-file:        LICENSE
+Author:              Benjamin Jones
+Maintainer:          benjaminfjones@gmail.com
+Build-Type:          Simple
+Cabal-Version:       >=1.2
+Executable theseus
+  Main-is:           Main.hs
+  Build-Depends:     base >= 2
