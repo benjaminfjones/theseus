@@ -21,23 +21,25 @@ module Labyrinth
 data Node a = DeadEnd a
             | Passage a (Node a)
             | Fork a (Node a) (Node a)
+            deriving (Eq)
 
 instance (Show a) => Show (Node a) where
     show = show' 0 where
-        show' n (DeadEnd x) = (pad n) ++ "DeadEnd " ++ (show x)
-        show' n (Passage x node) = (pad n) ++ "Passage " ++ (show x) ++ "\n" ++
-                                   (show' (n+1) node)
-        show' n (Fork x node1 node2) = (pad n) ++ "Fork " ++ (show x) ++ "\n" ++
-                                   (show' (n+1) node1) ++ "\n" ++
-                                   (show' (n+1) node2)
-        pad n = concat . take n . repeat $ "   "
+        show' n (DeadEnd x) = pad n ++ "DeadEnd " ++ show x
+        show' n (Passage x node) = pad n ++ "Passage " ++ show x ++ "\n" ++
+                                   show' (n+1) node
+        show' n (Fork x node1 node2) = pad n ++ "Fork " ++ show x ++ "\n" ++
+                                   show' (n+1) node1 ++ "\n" ++
+                                   show' (n+1) node2
+        pad n = concat $ replicate n "    "
 
 
 -- | We keep track of the player using a list of branches. There are three types of 
 -- branches.
-data Branch a = Straight a            -- ^ A straight passage has no sub-tree attached
-              | TurnLeft a (Node a)   -- ^ After turning left, we save the right-tree
-              | TurnRight a (Node a)  -- ^ After turning right, we save the left-tree
+data Branch a = Straight a           -- ^ a straight passage has no sub-tree attached
+              | TurnLeft a (Node a)  -- ^ save the right-tree
+              | TurnRight a (Node a) -- ^ save the left-tree
+              deriving (Eq, Show)
 
 -- | A Thread is a list of branches. Each branch contains a value of type `a` and
 -- possibly a sub-tree
